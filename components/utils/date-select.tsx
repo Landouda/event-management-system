@@ -28,15 +28,13 @@ export function DateSelect() {
   const[date,setDate]=useState(new Date())
 
   return (
-    
-     
               <Popover>
                 <PopoverTrigger asChild>
                   {/* <FormControl> */}
                     <Button
                       variant={"outline"}
                       className={cn(
-                        "w-[240px] pl-3 text-left font-normal",
+                        "pl-3 text-left font-normal",
                         
                       )}
                     >

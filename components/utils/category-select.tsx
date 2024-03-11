@@ -1,4 +1,4 @@
-import * as React from "react"
+import * as React from "react";
 
 import {
   Select,
@@ -8,12 +8,12 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 
 export function CategorySelect() {
   return (
     <Select>
-      <SelectTrigger className="w-[180px]">
+      <SelectTrigger>
         <SelectValue placeholder="Select a category" />
       </SelectTrigger>
       <SelectContent>
@@ -21,12 +21,12 @@ export function CategorySelect() {
           <SelectLabel>Categories</SelectLabel>
           <SelectItem value="conference">Conference</SelectItem>
           <SelectItem value="seminar">Seminar</SelectItem>
-            <SelectItem value="workshop">Workshop</SelectItem>
+          <SelectItem value="workshop">Workshop</SelectItem>
           <SelectItem value="webinar">Webinar</SelectItem>
           <SelectItem value="concert">Concert</SelectItem>
           <SelectItem value="festival">Festival</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
-  )
+  );
 }
