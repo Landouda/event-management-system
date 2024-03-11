@@ -95,7 +95,14 @@ const events = [
   },
 ];
 
+enum Tabs {
+  Event,
+  Attendees,
+  Mail,
+}
+
 export default function Event() {
+  const [tab, setTabs] = useState(Tabs.Event);
   return (
     <div className="">
       <CustomDrawer
@@ -103,8 +110,42 @@ export default function Event() {
         header={"Create Event"}
         description={"fill out this form, and make sure to save the changes."}
       >
-        {/* <AddEvent /> */}
-        <AddAttendee />
+        <div className="flex my-10">
+          <div className="flex flex-col gap-2 px-10 justify-between ">
+            <button
+              className={cn(
+                "h-10 w-10 border rounded-full flex justify-center items-center",
+                tab == Tabs.Event && "border-green-300 text-green-300"
+              )}
+              onClick={() => setTabs(Tabs.Event)}
+            >
+              1
+            </button>
+            <button
+              className={cn(
+                "h-10 w-10 border rounded-full flex justify-center items-center",
+                tab == Tabs.Attendees && "border-green-300 text-green-300"
+              )}
+              onClick={() => setTabs(Tabs.Attendees)}
+            >
+              2
+            </button>
+            <button
+              className={cn(
+                "h-10 w-10 border rounded-full flex justify-center items-center",
+                tab == Tabs.Mail && "border-green-300 text-green-300"
+              )}
+              onClick={() => setTabs(Tabs.Mail)}
+            >
+              3
+            </button>
+          </div>
+          <div className="grow">
+            {tab == Tabs.Event && <AddEvent />}
+            {tab == Tabs.Attendees && <AddAttendee />}
+          </div>
+        </div>
+        <Button type="submit">Save changes</Button>
       </CustomDrawer>
       <div className="grid grid-cols-4 gap-2">
         {events.map((event, index) => {

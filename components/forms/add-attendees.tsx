@@ -3,6 +3,7 @@ import { Input } from "../ui/input";
 import * as XLSX from "xlsx";
 import CustomTable from "../utils/custom-table";
 import { ColumnDef } from "@tanstack/react-table";
+import { Label } from "../ui/label";
 
 export type Attendee = {
   name: string;
@@ -61,9 +62,10 @@ export default function AddAttendee() {
     };
 
     reader.readAsArrayBuffer(file);
-  };
+  };    
   return (
-    <div>
+    <div className="grid items-start gap-4">
+      <Label>Attendees</Label>
       <Input type="file" onChange={handleFileUpload}></Input>
       <CustomTable columns={columns} data={attendees} />
     </div>
