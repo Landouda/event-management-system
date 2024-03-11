@@ -98,15 +98,19 @@ const events = [
 export default function Event() {
   return (
     <div className="">
-        <CustomDrawer name={"Add Event"} header={"Create Event"} description={"fill out this form, and make sure to save the changes."}>
-
-      {/* <AddEvent /> */}
-      <AddAttendee/>
-        </CustomDrawer>
+      <CustomDrawer
+        name={"Add Event"}
+        header={"Create Event"}
+        description={"fill out this form, and make sure to save the changes."}
+      >
+        {/* <AddEvent /> */}
+        <AddAttendee />
+      </CustomDrawer>
       <div className="grid grid-cols-4 gap-2">
-        {events.map((event) => {
+        {events.map((event, index) => {
           return (
             <EventCard
+              key={index}
               date={event.date}
               time={event.time}
               name={event.name}
