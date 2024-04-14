@@ -7,19 +7,8 @@ import React, { useState } from "react";
 import { DrawerClose } from "../ui/drawer";
 import CustomTable from "../utils/custom-table";
 import { ColumnDef } from "@tanstack/react-table";
-<<<<<<< HEAD
 import { Attendee, OrangeEvent } from "@/lib/types";
 import { collection, doc, setDoc } from "firebase/firestore";
-=======
-import { collection, doc, getDoc, setDoc } from "firebase/firestore";
-
-export type Attendee = {
-  name: string;
-  last_name: string;
-  email: string;
-  number: number;
-};
->>>>>>> edfdd14b985b041ae0090cd6c30a971bcfa95181
 
 // ** Constants
 export const columns: ColumnDef<Attendee>[] = [
@@ -34,7 +23,6 @@ export const columns: ColumnDef<Attendee>[] = [
 ];
 
 interface AddAttendeeProps {
-<<<<<<< HEAD
   orangeEvent: OrangeEvent | undefined;
 }
 
@@ -47,16 +35,6 @@ export default function AddAttendee({ orangeEvent }: AddAttendeeProps) {
   const eventsRef = collection(db, "events");
 
   // ** Functions
-=======
-  eventId: string | undefined;
-}
-
-export default function AddAttendee({ eventId }: AddAttendeeProps) {
-  const [attendees, setAttendees] = useState<Attendee[]>([]);
-
-  const eventsRef = collection(db, "events");
-
->>>>>>> edfdd14b985b041ae0090cd6c30a971bcfa95181
   const handleFileUpload = async (e: any) => {
     const file = e.target.files[0];
     if (!file) {
@@ -75,10 +53,7 @@ export default function AddAttendee({ eventId }: AddAttendeeProps) {
         const sheet = workbook.Sheets[sheetName];
         const jsonData = XLSX.utils.sheet_to_json(sheet);
         setAttendees(jsonData as Attendee[]);
-<<<<<<< HEAD
         setIsAttendeesUploaded(true);
-=======
->>>>>>> edfdd14b985b041ae0090cd6c30a971bcfa95181
       } else {
         console.error("File could not be read");
       }
@@ -93,7 +68,6 @@ export default function AddAttendee({ eventId }: AddAttendeeProps) {
 
   const addAttendeesToEvent = async () => {
     // ** Get Event based on the eventId
-<<<<<<< HEAD
     if (!orangeEvent) {
       console.error("No event found");
       return;
@@ -109,17 +83,6 @@ export default function AddAttendee({ eventId }: AddAttendeeProps) {
         { merge: true }
       );
       fetch(`/api/send-email/${orangeEvent.id}`, {
-=======
-    const event = await getDoc(doc(eventsRef, eventId));
-
-    try {
-      // ** Update the attendees
-      await setDoc(doc(eventsRef, eventId), {
-        ...event.data(),
-        attendees,
-      });
-      fetch("/api/send-email", {
->>>>>>> edfdd14b985b041ae0090cd6c30a971bcfa95181
         method: "POST",
         body: JSON.stringify(attendees),
       });
@@ -132,7 +95,6 @@ export default function AddAttendee({ eventId }: AddAttendeeProps) {
     <div className="grid items-start gap-4 w-full mb-5 px-6">
       <Label>Attendees</Label>
       <Input type="file" onChange={handleFileUpload}></Input>
-<<<<<<< HEAD
       <CustomTable
         columns={columns}
         data={
@@ -156,11 +118,6 @@ export default function AddAttendee({ eventId }: AddAttendeeProps) {
             Cancel
           </Button>
         </div>
-=======
-      <CustomTable columns={columns} data={attendees} />
-      <DrawerClose asChild>
-        <Button onClick={addAttendeesToEvent}>Add Attendees</Button>
->>>>>>> edfdd14b985b041ae0090cd6c30a971bcfa95181
       </DrawerClose>
     </div>
   );
