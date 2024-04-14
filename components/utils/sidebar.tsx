@@ -1,55 +1,37 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import { CalendarDays, CircleHelp, Cog, Home, LineChart, PieChart, Users } from "lucide-react";
+
+import { navbarLinks } from "@/lib/constants";
+import { usePathname } from "next/navigation";
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
-    <div className="border h-[90vh]">
+    <div className="border h-[90vh] hidden lg:block">
       <ul>
-        <li className="px-4 py-1 border-b hover:bg-slate-200 transition">
-          <Link className="flex gap-2" href="/">
-            <Home size={22}/>
-            <p>Home</p>
-          </Link>
-        </li>
-
-        <li className="px-4 py-1 border-b hover:bg-slate-200 transition">
-          <Link className="flex gap-2" href="/dashboard"> 
-          <LineChart />
-          <p>Dashboard </p>
-          </Link>
-        </li>
-
-        <li className="px-4 py-1 border-b hover:bg-slate-200 transition">
-          <Link className="flex gap-2" href="/event">
-          <CalendarDays />
-            <p>Event</p>
+        {navbarLinks.map((link, index) => {
+          const isActive =
+            pathname === link.route ||
+            (pathname.includes(link.route) && link.route !== "/");
+          return (
+            <li
+              key={index}
+              className={
+                isActive
+                  ? "px-4 py-1 text-primary bg-orange-500 text-white"
+                  : "px-4 py-1 hover:bg-orange-500/10 transition border-b"
+              }
+            >
+              <Link href={link.route} className="flex items-center gap-2">
+                {link.icon}
+                {link.label}
               </Link>
-        </li>
-
-        <li className="px-4 py-1 border-b hover:bg-slate-200 transition">
-          <Link  className="flex gap-2" href="/attendees"> 
-          <Users />
-          <p>Attendees</p> </Link>
-        </li>
-
-        <li className="px-4 py-1 border-b hover:bg-slate-200 transition">
-          <Link className="flex gap-2" href="/analytics">
-          <PieChart />
-             <p>Analytics</p> </Link>
-        </li>
-
-        <li className="px-4 py-1 border-b hover:bg-slate-200 transition">
-          <Link className="flex gap-2"href="/settings">
-          <Cog />
-             Settings </Link>
-        </li>
-
-        <li className="px-4 py-1 border-b hover:bg-slate-200 transition">
-          <Link className="flex gap-2" href="/help">
-          <CircleHelp />
-            <p>Help</p> </Link>
-        </li>
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

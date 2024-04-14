@@ -1,9 +1,9 @@
+import "./globals.css";
+import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
 import Navbar from "@/components/utils/navbar";
 import Sidebar from "@/components/utils/sidebar";
-import { cn } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,17 +19,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn(inter.className,"h-screen")}>
-
-        
+      <body className={cn(inter.className, "h-screen")}>
         <Navbar />
-
         <div className="flex">
           <Sidebar />
           {children}
         </div>
-
-       
       </body>
     </html>
   );
