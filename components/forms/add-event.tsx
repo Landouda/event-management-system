@@ -17,28 +17,37 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar } from "../ui/calendar";
-import { citiesInTunisia } from "@/lib/constants";
 import { db, firestoreAutoId } from "@/firebase";
 import { collection, doc, setDoc, updateDoc } from "firebase/firestore";
 import { Button } from "../ui/button";
 import { CalendarIcon } from "lucide-react";
 import { DrawerClose } from "../ui/drawer";
 import { Tabs } from "../utils/custom-drawer";
+import { GoogleMapsComponent } from "../GoogleMapsComponent";
+import { useState } from "react";
 
 interface EventFormProps {
   event: OrangeEvent | undefined;
+  events: OrangeEvent[];
   setTabs: React.Dispatch<React.SetStateAction<Tabs>>;
+  setEvents: React.Dispatch<React.SetStateAction<OrangeEvent[]>>;
 }
 
-const AddEventForm = ({ event, setTabs }: EventFormProps) => {
-  const addEventSchema = z.object({
-    title: z.string().min(1),
-    description: z.string().min(1),
-    date: z.date(),
-    time: z.string().min(1),
-    category: z.string().min(1),
-    location: z.string().min(1),
-  });
+const addEventSchema = z.object({
+  title: z.string().min(1),
+  description: z.string().min(1),
+  date: z.date(),
+  time: z.string().min(1),
+  category: z.string().min(1),
+});
+
+const AddEventForm = ({
+  event,
+  events,
+  setTabs,
+  setEvents,
+}: EventFormProps) => {
+  const [selectedLocation, setSelectedLocation] = useState("");
 
   // ** React Hook Form
   const form = useForm<z.infer<typeof addEventSchema>>({
@@ -46,7 +55,6 @@ const AddEventForm = ({ event, setTabs }: EventFormProps) => {
       time: event?.time,
       title: event?.title,
       category: event?.category,
-      location: event?.location,
       description: event?.description,
       date: event ? new Date(event.date) : new Date(),
     },
@@ -58,33 +66,66 @@ const AddEventForm = ({ event, setTabs }: EventFormProps) => {
   const eventsRef = collection(db, "events");
 
   const onSubmit = async (data: z.infer<typeof addEventSchema>) => {
-    console.log(data);
     try {
       if (event) {
         // ** Update event
         await updateDoc(doc(eventsRef, event.id), {
           ...data,
+          location: selectedLocation,
         });
         setTabs(Tabs.Attendees);
+        setEvents(
+          events.map((e: OrangeEvent) =>
+            e.id === event.id
+              ? {
+                  id: e.id,
+                  date: data.date.toLocaleDateString(),
+                  title: data.title,
+                  time: data.time,
+                  location: selectedLocation,
+                  category: data.category,
+                  description: data.description,
+                  isArchived: false,
+                  attendees: e.attendees,
+                  totalPeopleAttending: e.totalPeopleAttending,
+                }
+              : e
+          )
+        );
 
-        console.log("first");
         return;
       }
       const id = firestoreAutoId();
-      await setDoc(doc(eventsRef, id), {
+      const newEvent = {
         id,
-        ...data,
+        date: data.date,
+        title: data.title,
+        time: data.time,
+        location: selectedLocation,
+        category: data.category,
+        description: data.description,
         isArchived: false,
         attendees: [],
-      });
-      console.log({
-        id,
-        ...data,
-        isArchived: false,
-        attendees: [],
-        total_people_attending: 0,
-      });
+        totalPeopleAttending: 0,
+      };
+      await setDoc(doc(eventsRef, id), newEvent);
+
       setTabs(Tabs.Attendees);
+      setEvents([
+        ...events,
+        {
+          id,
+          date: data.date.toLocaleDateString(),
+          title: data.title,
+          time: data.time,
+          location: selectedLocation,
+          category: data.category,
+          description: data.description,
+          isArchived: false,
+          attendees: [],
+          totalPeopleAttending: 0,
+        },
+      ]);
     } catch (error) {
       console.error("Error adding document: ", error);
     }
@@ -186,29 +227,9 @@ const AddEventForm = ({ event, setTabs }: EventFormProps) => {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <Label>Location</Label>
-              <Select onValueChange={field.onChange} value={field.value}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a City" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    {citiesInTunisia.map((city) => (
-                      <SelectItem key={city} value={city}>
-                        {city}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+        <GoogleMapsComponent
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
         />
         <div className="col-span-full md:col-span-2 flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-3">
           <Button className="w-full" type="submit">

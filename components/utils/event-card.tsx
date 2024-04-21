@@ -22,15 +22,20 @@ import {
   PieChart,
 } from "lucide-react";
 import CustomDrawer from "./custom-drawer";
+import events from "events";
 
 type EventProps = {
   event: OrangeEvent;
+  events: OrangeEvent[];
+  setEvents: React.Dispatch<React.SetStateAction<OrangeEvent[]>>;
 };
 
-export default function EventCard({ event }: EventProps) {
+export default function EventCard({ event, events, setEvents }: EventProps) {
+  const eventsCollection = collection(db, "events");
   const handleDeleteEvent = async (id: string) => {
     try {
-      await deleteDoc(doc(db, "events", id));
+      await deleteDoc(doc(eventsCollection, id));
+      setEvents((prev) => prev.filter((event) => event.id !== id));
     } catch (error) {
       console.error("Error deleting event: ", error);
     }
@@ -38,10 +43,14 @@ export default function EventCard({ event }: EventProps) {
 
   const handleArchive = async (id: string) => {
     try {
-      const eventsCollection = collection(db, "events");
       await updateDoc(doc(eventsCollection, id), {
         isArchived: event.isArchived ? false : true,
       });
+      setEvents((prev) =>
+        prev.map((event) =>
+          event.id === id ? { ...event, isArchived: !event.isArchived } : event
+        )
+      );
     } catch (error) {
       console.error("Error archiving event: ", error);
     }
@@ -61,7 +70,7 @@ export default function EventCard({ event }: EventProps) {
       </div>
       <div className="flex flex-col sm:flex-row gap-2 mt-4 ">
         <div className="absolute top-8 right-8">
-          <CustomDrawer event={event} />
+          <CustomDrawer event={event} setEvents={setEvents} events={events} />
         </div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -129,7 +138,9 @@ export default function EventCard({ event }: EventProps) {
                   <p>Here are the analytics for this event.</p>
                   <div className="flex gap-3 flex-col lg:flex-row items-center">
                     <p>Total people invited: {event.attendees.length}</p>
-                    <p>Total people attended: {event.totalPeopleAttending}</p>
+                    <p>
+                      Total people attended: {event.totalPeopleAttending || 0}
+                    </p>
                   </div>
                 </div>
               </AlertDialogDescription>

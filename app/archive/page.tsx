@@ -47,7 +47,14 @@ const Archive = () => {
       {events
         .filter((event) => event.isArchived)
         .map((event, index) => {
-          return <EventCard key={index} event={event} />;
+          return (
+            <EventCard
+              key={index}
+              event={event}
+              events={events}
+              setEvents={setEvents}
+            />
+          );
         })}
     </div>
   );

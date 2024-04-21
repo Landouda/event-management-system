@@ -16,6 +16,8 @@ import AddEventForm from "../forms/add-event";
 
 type DrawerProps = {
   event?: OrangeEvent;
+  events: OrangeEvent[];
+  setEvents: React.Dispatch<React.SetStateAction<OrangeEvent[]>>;
 };
 
 export enum Tabs {
@@ -23,7 +25,11 @@ export enum Tabs {
   Attendees,
 }
 
-export default function CustomDrawer({ event }: DrawerProps) {
+export default function CustomDrawer({
+  event,
+  events,
+  setEvents,
+}: DrawerProps) {
   // ** States
   const [open, setOpen] = useState(false);
   const [tab, setTabs] = useState(Tabs.Event);
@@ -81,7 +87,12 @@ export default function CustomDrawer({ event }: DrawerProps) {
             </Button>
           </div>
           {tab === Tabs.Event ? (
-            <AddEventForm event={event} setTabs={setTabs} />
+            <AddEventForm
+              event={event}
+              events={events}
+              setTabs={setTabs}
+              setEvents={setEvents}
+            />
           ) : (
             <AddAttendee orangeEvent={event} />
           )}
