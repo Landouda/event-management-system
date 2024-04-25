@@ -1,7 +1,17 @@
 "use client";
 
+import ApexChart from "@/components/shared/ApexChart";
 import { IEvent, getAllEvents } from "@/lib/actions/event.actions";
+import { ApexOptions } from "apexcharts";
 import React, { useEffect, useState } from "react";
+
+const donutColors = {
+  series1: "#7367F0",
+  series2: "#28C76F",
+  series3: "#EA5455",
+  series4: "#FF9F43",
+  series5: "#9C27B0",
+};
 
 const getTotalNumberOfEvents = (events: IEvent[]) => events.length;
 
@@ -87,10 +97,134 @@ const AnalyticsPage = () => {
   const attendeesOverTime = getAttendeesOverTime(events);
   const totalNumberOfEvents = getTotalNumberOfEvents(events);
   const totalNumberOfAttendees = getTotalNumberOfAttendees(events);
-  const archivedVsActiveEvents = getArchivedVsActiveEvents(events);
   const emailDomainDistribution = getEmailDomainDistribution(events);
   const averageNumberOfAttendeesPerEvent =
     getAverageNumberOfAttendeesPerEvent(events);
+
+  const eventsByCategoryOptions: ApexOptions = {
+    stroke: { width: 0 },
+    colors: [donutColors.series1, donutColors.series2],
+    dataLabels: {
+      enabled: false,
+    },
+    legend: {
+      position: "bottom",
+      markers: { offsetX: -3 },
+      itemMargin: {
+        vertical: 3,
+        horizontal: 10,
+      },
+    },
+    plotOptions: {
+      bar: {
+        borderRadius: 4,
+        columnWidth: "50%",
+      },
+    },
+    chart: {
+      toolbar: {
+        show: false,
+      },
+    },
+    xaxis: {
+      categories: Object.keys(eventsByCategory),
+    },
+  };
+  const { archived, active } = getArchivedVsActiveEvents(events);
+
+  const archivedVsActiveEventsOptions: ApexOptions = {
+    stroke: { width: 0 },
+    labels: ["Archived", "Active"],
+    colors: [donutColors.series1, donutColors.series2],
+    dataLabels: {
+      enabled: false,
+    },
+    legend: {
+      position: "bottom",
+      markers: { offsetX: -3 },
+      itemMargin: {
+        vertical: 3,
+        horizontal: 10,
+      },
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          labels: {
+            show: true,
+            name: {
+              fontSize: "1.2rem",
+            },
+            value: {
+              fontSize: "1.2rem",
+              fontWeight: "bold",
+              formatter: (val: any) =>
+                `${Math.round((parseFloat(val) / totalNumberOfEvents) * 100)}%`,
+              color: "#7367F0",
+            },
+            total: {
+              show: true,
+              color: "#7367F0",
+              fontSize: "1.2rem",
+              fontWeight: "bold",
+              label: "Total Events",
+              formatter: () => `${totalNumberOfEvents}`,
+            },
+          },
+        },
+      },
+    },
+  };
+
+  const emailDomainDistributionOptions: ApexOptions = {
+    stroke: { width: 0 },
+    labels: Object.keys(emailDomainDistribution),
+    colors: [
+      donutColors.series1,
+      donutColors.series2,
+      donutColors.series3,
+      donutColors.series4,
+      donutColors.series5,
+    ],
+    dataLabels: {
+      enabled: false,
+    },
+    legend: {
+      position: "bottom",
+      markers: { offsetX: -3 },
+      itemMargin: {
+        vertical: 3,
+        horizontal: 10,
+      },
+    },
+    plotOptions: {
+      pie: {
+        donut: {
+          labels: {
+            show: true,
+            name: {
+              fontSize: "1.2rem",
+            },
+            value: {
+              fontSize: "1.2rem",
+              fontWeight: "bold",
+              formatter: (val: any) =>
+                `${Math.round((parseFloat(val) / totalNumberOfEvents) * 100)}%`,
+              color: "#7367F0",
+            },
+            total: {
+              show: true,
+              color: "#7367F0",
+              fontSize: "1.2rem",
+              fontWeight: "bold",
+              label: "Total Domains",
+              formatter: () => `${Object.keys(emailDomainDistribution).length}`,
+            },
+          },
+        },
+      },
+    },
+  };
 
   return (
     <>
@@ -101,54 +235,59 @@ const AnalyticsPage = () => {
       </section>
       <div className="wrapper my-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="bg-white p-5 rounded">
+          <div className="bg-white p-5 rounded-2xl border border-orange-500">
             <h4 className="h4-bold">Total Number of Events</h4>
             <p className="font-semibold">{totalNumberOfEvents}</p>
           </div>
-          <div className="bg-white p-5 rounded">
-            <h4 className="h4-bold">Events by Category</h4>
-            <ul>
-              {Object.entries(eventsByCategory).map(([category, count]) => (
-                <li key={category}>
-                  {category}: {count}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="bg-white p-5 rounded">
-            <h4 className="h4-bold">Total Number of Attendees</h4>
+          <div className="bg-white border border-orange-500 p-5 rounded-2xl">
+            <h4 className="h4-bold">
+              Total Number of Attendees Across All Events
+            </h4>
             <p className="font-semibold">{totalNumberOfAttendees}</p>
           </div>
-          <div className="bg-white p-5 rounded">
+          <div className="bg-white  border border-orange-500 rounded-2xl">
+            <h4 className="h4-bold p-5">Events by Category</h4>
+            <ApexChart
+              type="bar"
+              height={350}
+              options={eventsByCategoryOptions}
+              series={[
+                {
+                  name: "Events",
+                  data: Object.values(eventsByCategory),
+                },
+              ]}
+            />
+          </div>
+          <div className="bg-white border border-orange-500 p-5 rounded-2xl">
+            <h4 className="h4-bold">Email Domain Distribution</h4>
+            <ApexChart
+              type="donut"
+              height={350}
+              options={emailDomainDistributionOptions}
+              series={Object.values(emailDomainDistribution)}
+            />
+          </div>
+          {/* <div className="bg-white border border-orange-500 rounded-2xl">
+            <h4 className="h4-bold p-5">Archived vs Active Events</h4>
+            <ApexChart
+              type="donut"
+              height={350}
+              options={archivedVsActiveEventsOptions}
+              series={[archived, active]}
+            />
+          </div> */}
+
+          <div className="bg-white border border-orange-500 p-5 rounded-2xl">
             <h4 className="h4-bold">Average Number of Attendees per Event</h4>
             <p className="font-semibold">{averageNumberOfAttendeesPerEvent}</p>
           </div>
-          <div className="bg-white p-5 rounded">
+          <div className="bg-white border border-orange-500 p-5 rounded-2xl">
             <h4 className="h4-bold">Attendance Rate</h4>
             <p className="font-semibold">{attendanceRate}</p>
           </div>
-          <div className="bg-white p-5 rounded">
-            <h4 className="h4-bold">Archived vs Active Events</h4>
-            <p className="font-semibold">
-              Archived: {archivedVsActiveEvents.archived}
-            </p>
-            <p className="font-semibold">
-              Active: {archivedVsActiveEvents.active}
-            </p>
-          </div>
-          <div className="bg-white p-5 rounded">
-            <h4 className="h4-bold">Email Domain Distribution</h4>
-            <ul>
-              {Object.entries(emailDomainDistribution).map(
-                ([domain, count]) => (
-                  <li key={domain}>
-                    {domain}: {count}
-                  </li>
-                )
-              )}
-            </ul>
-          </div>
-          <div className="bg-white p-5 rounded">
+
+          {/* <div className="bg-white border border-orange-500 p-5 rounded-2xl">
             <h4 className="h4-bold">Events Over Time</h4>
             <ul>
               {Object.entries(eventsOverTime).map(([date, count]) => (
@@ -166,7 +305,7 @@ const AnalyticsPage = () => {
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
         </div>
       </div>
     </>
