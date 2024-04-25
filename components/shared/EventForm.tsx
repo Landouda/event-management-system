@@ -253,6 +253,12 @@ const EventForm = ({
       };
 
       await createEvent(newEvent);
+      fetch(`/api/send-email?eventId=${newEvent.id}`, {
+        method: "POST",
+        body: JSON.stringify(
+          uploadedAttendees.length > 0 ? uploadedAttendees : []
+        ),
+      });
       window.location.replace(`/`);
     } else {
       // update event
@@ -273,6 +279,14 @@ const EventForm = ({
         totalPeopleAttending: event?.totalPeopleAttending || 0,
       };
       await updateEvent(eventId as string, updatedEvent);
+
+      fetch(`/api/send-email?eventId=${eventId}`, {
+        method: "POST",
+        body: JSON.stringify(
+          uploadedAttendees.length > 0 ? uploadedAttendees : []
+        ),
+      });
+
       window.location.replace(`/`);
     }
   }
