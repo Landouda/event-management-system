@@ -253,12 +253,6 @@ const EventForm = ({
       };
 
       await createEvent(newEvent);
-      fetch(`/api/send-email/${newEvent.id}`, {
-        method: "POST",
-        body: JSON.stringify(
-          uploadedAttendees.length > 0 ? uploadedAttendees : []
-        ),
-      });
       window.location.replace(`/`);
     } else {
       // update event
@@ -279,18 +273,6 @@ const EventForm = ({
         totalPeopleAttending: event?.totalPeopleAttending || 0,
       };
       await updateEvent(eventId as string, updatedEvent);
-      // Assuming previousAttendees is the array of previous attendees
-      if (
-        JSON.stringify(uploadedAttendees.sort()) !==
-        JSON.stringify(event?.attendees.sort())
-      ) {
-        fetch(`/api/send-email/${eventId}`, {
-          method: "POST",
-          body: JSON.stringify(
-            uploadedAttendees.length > 0 ? uploadedAttendees : []
-          ),
-        });
-      }
       window.location.replace(`/`);
     }
   }
